@@ -14,6 +14,7 @@ import paginationHelper from "../../../utils/pagination_helper";
 import { postSearchFields } from "./post.constant";
 import { SortOrder, Types } from "mongoose";
 import { GamificationService } from "../gamification/gamification.service";
+import { WritingStreakService } from "../gamification/writing_streak.service";
 import { escapeRegex } from "../../../utils/regex.util";
 const MAX_SEARCH_TERM_LENGTH = 100;
 
@@ -117,6 +118,7 @@ const createPost = async (payload: IPostPayload, token: ITokenPayload) => {
       if (updatedUser && updatedUser.postsCount === 1) {
         GamificationService.awardBadge(String(user._id), "First Story").catch(console.error);
       }
+      WritingStreakService.updateStreakAndUnlocks(String(user._id)).catch(console.error);
     }
     return res;
   } catch (error) {
@@ -549,6 +551,7 @@ const remixStory = async (postId: string, prompt: string, token: ITokenPayload) 
       user._id,
       { $inc: { postsCount: 1 } }
     );
+    WritingStreakService.updateStreakAndUnlocks(String(user._id)).catch(console.error);
   }
 
   return res;
@@ -587,6 +590,7 @@ const translateStory = async (postId: string, language: string, token: ITokenPay
       user._id,
       { $inc: { postsCount: 1 } }
     );
+    WritingStreakService.updateStreakAndUnlocks(String(user._id)).catch(console.error);
   }
 
   return res;
